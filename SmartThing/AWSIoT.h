@@ -5,7 +5,7 @@
 #include <functional>
 
 #define THING_NAME "esp32-maqueta"
-#define MQTT_MAX_PACKET_SIZE 512
+#define MQTT_MAX_PACKET_SIZE 4096
 
 typedef std::function<void(const char* topic, const char* payload)> MessageCallback;
 

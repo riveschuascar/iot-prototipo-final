@@ -30,7 +30,7 @@ void AWSIoT::setupCertificates() {
 
 void AWSIoT::setupTopics() {
   sprintf(publishTopic, "$aws/things/%s/shadow/update", THING_NAME);
-  sprintf(getTopic, "$aws/things/%s/shadow/get", THING_NAME); // NUEVO
+  sprintf(getTopic, "$aws/things/%s/shadow/get", THING_NAME);
   
   subscribeTopic[0] = new char[100];
   subscribeTopic[1] = new char[100];
@@ -38,11 +38,11 @@ void AWSIoT::setupTopics() {
   subscribeTopic[3] = new char[100];
   subscribeTopic[4] = new char[100];
   
-  sprintf(subscribeTopic[0], "$aws/things/%s/shadow/update/accepted", THING_NAME);
-  sprintf(subscribeTopic[1], "$aws/things/%s/shadow/update/rejected", THING_NAME);
+  sprintf(subscribeTopic[0], "$aws/things/%s/shadow/get/accepted", THING_NAME);
+  sprintf(subscribeTopic[1], "$aws/things/%s/shadow/get/rejected", THING_NAME);
   sprintf(subscribeTopic[2], "$aws/things/%s/shadow/update/delta", THING_NAME);
-  sprintf(subscribeTopic[3], "$aws/things/%s/shadow/get/accepted", THING_NAME);
-  sprintf(subscribeTopic[4], "$aws/things/%s/shadow/get/rejected", THING_NAME);
+  sprintf(subscribeTopic[3], "$aws/things/%s/shadow/update/accepted", THING_NAME);
+  sprintf(subscribeTopic[4], "$aws/things/%s/shadow/update/rejected", THING_NAME);
 }
 
 void AWSIoT::setMessageCallback(MessageCallback callback) {
@@ -70,12 +70,10 @@ void AWSIoT::publishState(const char* jsonState) {
 
 void AWSIoT::getState() {
   if (client.connected()) {
-    const char* emptyMessage = "{}";
-    
-    if (client.publish(getTopic, emptyMessage)) {
+    if (client.publish(getTopic, "{}")) {
       Serial.println("Solicitando estado");
       Serial.printf("Published to: %s\n", getTopic);
-      loop();
+      client.loop();
     } else {
       Serial.println("No se pudo solicitar estado");
     }
