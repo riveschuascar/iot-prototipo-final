@@ -5,8 +5,9 @@
 #include <functional>
 
 #define THING_NAME "esp32-maqueta"
-#define MQTT_MAX_PACKET_SIZE 4096
+#define MQTT_MAX_PACKET_SIZE 4096 // In bytes, aprox 4Kb
 
+// Define a Callback function as object for future use
 typedef std::function<void(const char* topic, const char* payload)> MessageCallback;
 
 class AWSIoT {

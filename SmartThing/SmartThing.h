@@ -7,7 +7,7 @@
 #include "GasSensor.h"
 #include "FanController.h"
 
-typedef std::function<void(const char* jsonState)> StateCallback;
+typedef std::function<void(const char* jsonState)> StateCallback; // Define a funtion for publish callback updates as an object/class
 
 class SmartThing {
 public:
@@ -30,10 +30,11 @@ private:
   int currentServoAngle;
   bool fanEnabled;
   bool autoMode;
-  int gasThreshold;
+  int gasThresholdServo;
+  int gasThresholdFan;
 
   void publishCurrentState();
   void handleDesiredState(JsonObject desired);
   void checkGasLevel();
-  void autoControlFan();
+  void autoControl();
 };
