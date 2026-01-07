@@ -4,7 +4,7 @@
 
 class FanController {
   public:
-    FanController(int pin = 23);
+    FanController(int pin = 26);
     void begin();
     void turnOn();
     void turnOff();

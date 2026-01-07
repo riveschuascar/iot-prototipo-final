@@ -153,21 +153,9 @@ void SmartThing::handleAWSMessage(const char* topic, const char* payload) {
     return;
   }
 
-  // Debug: Mostrar estructura del JSON recibido
-  Serial.println("[DEBUG] Estructura JSON recibida:");
-  serializeJsonPretty(doc, Serial);
-  Serial.println();
-
   // Verificar si es respuesta de /shadow/get/accepted (estado completo)
   if (strstr(topic, "/shadow/get/accepted") != NULL) {
     Serial.println("[INFO] Recibiendo estado completo del shadow");
-
-    // Verificar estructura del mensaje
-    if (!doc.containsKey("state")) {
-      Serial.println("[ERROR] El mensaje no contiene el campo 'state'");
-      Serial.println("[DEBUG] Estructura esperada: {\"state\":{\"desired\":{...},\"reported\":{...}}}");
-      return;
-    }
 
     JsonObject state = doc["state"];
 

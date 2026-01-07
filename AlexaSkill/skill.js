@@ -114,6 +114,31 @@
                         "configurar umbral de {device} a {value}",
                         "configura el umbral del {device} a {value}"
                     ]
+                },
+                {
+                    "name": "ChangeIntervalIntent",
+                    "slots": [
+                        {
+                            "name": "time",
+                            "type": "AMAZON.NUMBER",
+                            "samples": [
+                                "{time} segundos",
+                                "{time}",
+                                "cada {time}",
+                                "cada {time} segundos"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "ajusta el intervalo de envio",
+                        "configura el periodo de envio",
+                        "establece el intervalo de envio en {time} segundos",
+                        "manda los datos cada {time} segundos",
+                        "establece el intervalo en {time} segundos",
+                        "configura el intervalo a {time} segundos",
+                        "ajusta el intervalo a {time} segundos",
+                        "cambia el intervalo a {time} segundos"
+                    ]
                 }
             ],
             "types": [
@@ -260,6 +285,34 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "ChangeIntervalIntent",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "time",
+                            "type": "AMAZON.NUMBER",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.1626012759122.852634404255"
+                            },
+                            "validations": [
+                                {
+                                    "type": "isLessThanOrEqualTo",
+                                    "prompt": "Slot.Validation.988111060965.692436453712.1101817379443",
+                                    "value": "60"
+                                },
+                                {
+                                    "type": "isGreaterThanOrEqualTo",
+                                    "prompt": "Slot.Validation.988111060965.692436453712.1006977905156",
+                                    "value": "10"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ],
             "delegationStrategy": "ALWAYS"
@@ -343,6 +396,33 @@
                     {
                         "type": "PlainText",
                         "value": "El umbral debe ser menor o igual a mil."
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.1626012759122.852634404255",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "¿Cada cuántos segundos deseas enviar los datos?"
+                    }
+                ]
+            },
+            {
+                "id": "Slot.Validation.988111060965.692436453712.1101817379443",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "El intervalo no puede superar los sesenta segundos."
+                    }
+                ]
+            },
+            {
+                "id": "Slot.Validation.988111060965.692436453712.1006977905156",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "El intervalo no puede ser menor a diez segundos."
                     }
                 ]
             }
