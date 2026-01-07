@@ -31,12 +31,11 @@ void SmartThing::loop() {
   // Verificar nivel de gas periódicamente
   if (millis() - lastGasCheck >= gasCheckInterval) {
     checkGasLevel();
+    // Control automático si está habilitado
+    if (autoMode) {
+      autoControl();
+    }
     lastGasCheck = millis();
-  }
-
-  // Control automático si está habilitado
-  if (autoMode) {
-    autoControl();
   }
 }
 
@@ -78,33 +77,31 @@ void SmartThing::autoControl() {
   int gasLevel = gasSensor.read();
 
   // Si el gas supera el umbral, encender ventilador
-  if (gasLevel > gasThresholdFan && !fanEnabled) {
+  if (gasLevel > gasThresholdFan) {
     fan.turnOn();
     fanEnabled = true;
     Serial.println("Ventilador encendido automáticamente");
-    publishCurrentState();
   }
   // Si el gas baja, apagar ventilador
-  else if (gasLevel < (gasThresholdFan - 50) && fanEnabled) {
+  else if (gasLevel < (gasThresholdFan - 50)) {
     fan.turnOff();
     fanEnabled = false;
     Serial.println("Ventilador apagado automáticamente");
-    publishCurrentState();
   }
+
   // Si el gas supera el umbral, abrir el servo
-  if (gasLevel > gasThresholdServo && currentServoAngle == 0) {
-    servo.setAngle(90);
-    currentServoAngle = 90;
+  if (gasLevel > gasThresholdServo) {
+    servo.setAngle(0);
+    currentServoAngle = 0;
     Serial.println("Servo abierto automáticamente");
-    publishCurrentState();
   }
   // Si el gas baja, cerrar el servo
-  else if (gasLevel < (gasThresholdServo - 50) && currentServoAngle == 90) {
+  else if (gasLevel < (gasThresholdServo - 50)) {
     servo.setAngle(90);
-    currentServoAngle = 0;
+    currentServoAngle = 90;
     Serial.println("Servo cerrado automáticamente");
-    publishCurrentState();
   }
+  publishCurrentState();
 }
 
 void SmartThing::handleAWSMessage(const char* topic, const char* payload) {

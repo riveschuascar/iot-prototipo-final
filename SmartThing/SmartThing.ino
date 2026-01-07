@@ -6,6 +6,10 @@ WiFiConfig wifiConfig;
 AWSIoT awsIoT;
 SmartThing smartThing;
 
+static uint8_t awsFailCount = 0;
+const uint8_t MAX_AWS_FAILS = 3;
+const uint32_t AWS_TIMEOUT = 20000; // 20 seconds
+
 void setup() {
   Serial.begin(115200);
   Serial.println("╔════════════════════════════════════════╗");
@@ -43,7 +47,12 @@ void setup() {
   awsIoT.begin();
   
   // Conectar a AWS y suscribirse a los topics
-  awsIoT.reconnectMQTT();
+  if (!awsIoT.reconnectMQTT(AWS_TIMEOUT)) {
+  Serial.println("AWS no disponible, borrando WiFi y reiniciando...");
+  WiFi.disconnect(true, true);  // borra credenciales
+  delay(1000);
+  ESP.restart();
+  }
 }
 
 void loop() {
@@ -54,9 +63,21 @@ void loop() {
     ESP.restart();
   }
 
-  // Mantener AWS IoT activo
-  awsIoT.loop();
-  
+  // Mantener AWS IoT
+  if (!awsIoT.loop()) {
+    awsFailCount++;
+    Serial.printf("AWS fallo (%d/%d)\n", awsFailCount, MAX_AWS_FAILS);
+
+    if (awsFailCount >= MAX_AWS_FAILS) {
+      Serial.println("AWS no disponible, borrando WiFi...");
+      WiFi.disconnect(true, true);
+      delay(1000);
+      ESP.restart();
+    }
+  } else {
+    awsFailCount = 0;
+  }
+
   // Actualizar lógica del dispositivo
   smartThing.loop();
 }

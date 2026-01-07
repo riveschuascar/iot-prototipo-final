@@ -14,12 +14,12 @@ class AWSIoT {
 public:
   AWSIoT();
   void begin();
-  void loop();
+  bool loop();
   void publishState(const char* jsonState);
   void getState();
   bool isConnected();
   void setMessageCallback(MessageCallback callback);
-  void reconnectMQTT();
+  bool reconnectMQTT(uint32_t timeoutMs);
 
 private:
   WiFiClientSecure wifiClient;

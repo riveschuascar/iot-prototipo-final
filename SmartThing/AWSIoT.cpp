@@ -88,44 +88,52 @@ void AWSIoT::getState() {
   }
 }
 
-void AWSIoT::reconnectMQTT() {
+bool AWSIoT::reconnectMQTT(uint32_t timeoutMs) {
+  uint32_t start = millis();
+
   while (!client.connected()) {
+
+    if (millis() - start > timeoutMs) {
+      Serial.println("Timeout conectando a AWS IoT");
+      return false;
+    }
+
     Serial.print("Conectando a AWS IoT... ");
-    
+
     if (client.connect(clientId)) {
       Serial.println("conectado!");
-      
-      // Suscribirse a todos los topics
+
       for (int i = 0; i < 5; i++) {
-        bool subscribed = client.subscribe(subscribeTopic[i]);
-        if (subscribed) {
+        if (client.subscribe(subscribeTopic[i])) {
           Serial.printf("Suscrito a: %s\n", subscribeTopic[i]);
-        } else {
-          Serial.printf("Error suscribiendo a: %s\n", subscribeTopic[i]);
         }
-        delay(100); // Short delay to ensure suscription is stablish
+        delay(100);
       }
-      
-      Serial.println("\nTodas las suscripciones completadas");
-      
-      // Solicitar el estado actual del shadow automaticamente
-      delay(500); // Pequeño delay para asegurar que las suscripciones esten activas
+
+      delay(500);
       getState();
-      
-    } else {
-      Serial.printf("fallo, rc=%d. Reintentando en 5s\n", client.state());
-      delay(5000);
+      return true;
     }
+
+    Serial.printf("fallo, rc=%d. Reintentando...\n", client.state());
+    delay(2000);
   }
+
+  return true;
 }
 
-void AWSIoT::loop() {
-  // Function that is called constanly to ensure funtionality
+bool AWSIoT::loop() {
+
   if (!client.connected()) {
-    reconnectMQTT();
+    if (!reconnectMQTT(10000)) {
+      return false;  // AWS no disponible
+    }
   }
+
   client.loop();
+  return true;
 }
+
 
 bool AWSIoT::isConnected() {
   return client.connected();
